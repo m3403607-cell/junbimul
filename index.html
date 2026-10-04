@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 내 가방 쏙! 준비물 치트키 🎒</title>
+
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+  <!-- Tailwind CSS & DaisyUI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Canvas Confetti for Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      min-height: 100vh;
+    }
+    /* 반짝이는 별 애니메이션 */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(5deg); }
+    }
+    .floating-rocket {
+      animation: float 3s ease-in-out infinite;
+    }
+    .checklist-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .checklist-card:hover {
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center items-center">
+
+  <div class="w-full max-w-2xl min-h-[90vh] glass rounded-3xl p-6 md:p-8 shadow-2xl border border-white/50 flex flex-col justify-between backdrop-blur-md">
+    
+    <div>
+      <!-- 상단 헤더 영역 -->
+      <header class="text-center my-4">
+        <div class="inline-block text-6xl md:text-7xl mb-3 floating-rocket">🚀</div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-sky-900 tracking-tight leading-tight drop-shadow-sm">
+          🚀 내 가방 쏙! 준비물 치트키 🎒
+        </h1>
+        <p class="text-sky-700 font-semibold text-lg md:text-xl mt-2">
+          우주선 타고 출발하기 전에 준비물을 모두 챙겨보자! ✨
+        </p>
+      </header>
+
+      <!-- 우주선 발사 준비율 (프로그레스 바) -->
+      <section class="my-6 bg-white/60 p-4 rounded-2xl shadow-inner border border-sky-100">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold text-sky-800 text-lg md:text-xl flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-6 h-6 text-sky-500"></i>
+            우주선 발사 준비율
+          </span>
+          <span id="progress-percent" class="font-black text-sky-600 text-xl md:text-2xl">0%</span>
+        </div>
+        <progress id="progress-bar" class="progress progress-info w-full h-5 rounded-full" value="0" max="100"></progress>
+      </section>
+
+      <!-- 준비물 입력 양식 -->
+      <section class="my-6">
+        <form id="todo-form" class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="todo-input" 
+              placeholder="여기에 더 챙길 준비물을 적어봐! (예: 물통 💧)" 
+              class="input input-lg w-full bg-white/80 border-2 border-sky-300 focus:border-sky-500 rounded-2xl text-lg md:text-xl text-sky-900 placeholder-sky-400 font-medium shadow-sm focus:outline-none pl-12"
+              required
+            />
+            <i data-lucide="plus-circle" class="absolute left-4 top-1/2 -translate-y-1/2 text-sky-400 w-6 h-6"></i>
+          </div>
+          <button 
+            type="submit" 
+            class="btn btn-lg bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-bold text-lg md:text-xl rounded-2xl border-none shadow-lg hover:shadow-sky-300/50 transition-all duration-200 flex items-center justify-center gap-2 px-6"
+          >
+            <span>추가하기</span>
+            <span class="text-2xl">🚀</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- 준비물 목록 리스트 -->
+      <section class="my-6">
+        <div class="flex justify-between items-center mb-4 px-2">
+          <h2 class="text-2xl font-bold text-sky-900 flex items-center gap-2">
+            <i data-lucide="check-square" class="w-7 h-7 text-sky-600"></i>
+            오늘의 준비물 목록
+          </h2>
+          <span id="item-count" class="badge badge-lg bg-sky-200 text-sky-800 border-none font-bold text-base px-4 py-3">
+            0개 남음
+          </span>
+        </div>
+
+        <ul id="todo-list" class="space-y-3">
+          <!-- 자바스크립트로 동적 생성됨 -->
+        </ul>
+      </section>
+    </div>
+
+    <!-- 하단 응원 메시지 및 리셋 버튼 -->
+    <footer class="mt-8 text-center pt-4 border-t border-sky-200/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-sky-700 font-medium text-base">
+        🌟 체크 버튼을 눌러 준비물을 가방에 쏙 넣어줘!
+      </p>
+      <button id="reset-btn" class="btn btn-sm btn-ghost text-sky-600 hover:bg-sky-100/50 rounded-xl font-semibold gap-1">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 처음부터 다시하기
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- 전부 다 챙겼을 때 뜨는 축하 모달 -->
+  <dialog id="success-modal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box bg-white/95 backdrop-blur-md border-4 border-sky-300 rounded-3xl p-8 text-center shadow-2xl">
+      <div class="text-7xl mb-4 floating-rocket inline-block">🚀✨</div>
+      <h3 class="font-extrabold text-3xl md:text-4xl text-sky-900 mb-2">
+        우주선 준비 완료!
+      </h3>
+      <p class="py-4 text-2xl font-bold text-sky-600 leading-relaxed">
+        오늘 준비물 끝! 🎉<br/>
+        완벽하게 준비된 씩씩한 우주 탐험가구나!
+      </p>
+      <div class="modal-action justify-center mt-6">
+        <form method="dialog">
+          <button class="btn btn-lg bg-sky-500 hover:bg-sky-600 text-white font-bold text-xl px-10 rounded-2xl border-none shadow-lg">
+            신나게 학교 가기! 🎒
+          </button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- JavaScript 애플리케이션 로직 -->
+  <script>
+    // 초기 기본 준비물 목록
+    const initialItems = [
+      { id: 1, text: '리코더 🎶', completed: false },
+      { id: 2, text: '실내화 👟', completed: false },
+      { id: 3, text: '알림장 📓', completed: false }
+    ];
+
+    let todos = [...initialItems];
+
+    // DOM 요소 가져오기
+    const todoForm = document.getElementById('todo-form');
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo-list');
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercent = document.getElementById('progress-percent');
+    const itemCount = document.getElementById('item-count');
+    const successModal = document.getElementById('success-modal');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // Web Audio API를 활용한 효과음 생성기 (외부 파일 없이 작동)
+    const playSound = (type) => {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        if (type === 'check') {
+          // 신나는 뾰롱~ 체크 소리
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.2);
+        } else if (type === 'uncheck') {
+          // 취소 소리
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
+          osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.15); // A3
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.15);
+        } else if (type === 'fanfare') {
+          // 승리 팡파르 소리
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + idx * 0.12 + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + idx * 0.12);
+            osc.stop(ctx.currentTime + idx * 0.12 + 0.35);
+          });
+        }
+      } catch (e) {
+        console.log('Audio Context not allowed without interaction');
+      }
+    };
+
+    // 목록 화면에 그리기
+    function render() {
+      todoList.innerHTML = '';
+
+      if (todos.length === 0) {
+        todoList.innerHTML = `
+          <div class="text-center py-10 bg-white/40 rounded-2xl border-2 border-dashed border-sky-200">
+            <p class="text-xl font-bold text-sky-700">준비물 목록이 비어있어요!</p>
+            <p class="text-sky-500 mt-1">위에 준비물을 입력하고 🚀 추가하기를 눌러보세요.</p>
+          </div>
+        `;
+      } else {
+        todos.forEach(item => {
+          const li = document.createElement('li');
+          li.className = `checklist-card flex items-center justify-between p-4 md:p-5 rounded-2xl bg-white/90 shadow-sm border ${
+            item.completed ? 'border-sky-200 bg-sky-50/80' : 'border-sky-100'
+          }`;
+
+          li.innerHTML = `
+            <div class="flex items-center gap-4 flex-1 mr-2">
+              <button 
+                onclick="toggleTodo(${item.id})"
+                class="btn btn-circle ${
+                  item.completed 
+                    ? 'btn-info text-white shadow-md shadow-sky-200' 
+                    : 'btn-outline border-2 border-sky-300 hover:bg-sky-100 hover:border-sky-400'
+                } transition-all duration-200 w-12 h-12 min-h-[3rem]"
+                aria-label="체크 버튼"
+              >
+                ${item.completed ? '<i data-lucide="check" class="w-7 h-7 stroke-[3]"></i>' : '<span class="text-lg font-bold text-sky-400">V</span>'}
+              </button>
+              <span class="text-xl md:text-2xl font-bold ${
+                item.completed 
+                  ? 'line-through text-sky-400 decoration-sky-400 decoration-4' 
+                  : 'text-sky-900'
+              } break-all">
+                ${escapeHtml(item.text)}
+              </span>
+            </div>
+            <button 
+              onclick="deleteTodo(${item.id})" 
+              class="btn btn-ghost btn-circle text-sky-300 hover:text-red-500 hover:bg-red-50"
+              title="삭제하기"
+            >
+              <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </button>
+          `;
+          todoList.appendChild(li);
+        });
+      }
+
+      // 상태 업데이트 (진행률 및 카운트)
+      updateProgress();
+
+      // 아이콘 새로고침
+      lucide.createIcons();
+    }
+
+    // 안전한 텍스트 이스케이프
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // 준비물 추가
+    todoForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = todoInput.value.trim();
+      if (text) {
+        todos.push({
+          id: Date.now(),
+          text: text,
+          completed: false
+        });
+        todoInput.value = '';
+        render();
+        playSound('check');
+      }
+    });
+
+    // 준비물 완료 토글
+    window.toggleTodo = function(id) {
+      todos = todos.map(item => {
+        if (item.id === id) {
+          const nextState = !item.completed;
+          playSound(nextState ? 'check' : 'uncheck');
+          return { ...item, completed: nextState };
+        }
+        return item;
+      });
+      render();
+    };
+
+    // 준비물 삭제
+    window.deleteTodo = function(id) {
+      todos = todos.filter(item => item.id !== id);
+      render();
+      playSound('uncheck');
+    };
+
+    // 진행률 계산 및 축하 효과
+    function updateProgress() {
+      const total = todos.length;
+      const completedCount = todos.filter(t => t.completed).length;
+      const remaining = total - completedCount;
+
+      const percent = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+      progressBar.value = percent;
+      progressPercent.innerText = `${percent}%`;
+
+      if (remaining === 0 && total > 0) {
+        itemCount.innerText = "🚀 모든 준비 완료!";
+        itemCount.className = "badge badge-lg bg-green-500 text-white font-bold text-base px-4 py-3 shadow-md";
+      } else {
+        itemCount.innerText = `${remaining}개 남음`;
+        itemCount.className = "badge badge-lg bg-sky-200 text-sky-800 border-none font-bold text-base px-4 py-3";
+      }
+
+      // 100% 달성 축하 미션 이벤트
+      if (percent === 100 && total > 0) {
+        setTimeout(() => {
+          triggerSuccess();
+        }, 200);
+      }
+    }
+
+    // 100% 달성 모달 및 폭죽 효과
+    let lastCelebrated = false;
+    function triggerSuccess() {
+      if (lastCelebrated) return;
+      lastCelebrated = true;
+
+      // 팡파르 소리
+      playSound('fanfare');
+
+      // 폭죽 (Confetti) 애니메이션
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+
+      // 축하 모달열기
+      if (successModal && typeof successModal.showModal === 'function') {
+        successModal.showModal();
+      }
+    }
+
+    // 리셋 기능
+    resetBtn.addEventListener('click', () => {
+      todos = [...initialItems];
+      lastCelebrated = false;
+      render();
+      playSound('check');
+    });
+
+    // 초기 실행
+    window.onload = function() {
+      render();
+    };
+  </script>
+</body>
+</html>
